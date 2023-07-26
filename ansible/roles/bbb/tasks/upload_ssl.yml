@@ -1,0 +1,15 @@
+---
+- name: Create folder for ssl certificate and key
+  ansible.builtin.file:
+    path: /local/certs
+    state: directory
+
+- name: Upload certificate.
+  ansible.builtin.copy:
+    src: "{{ ssl_crt_file }}"
+    dest: /local/certs/fullchain.pem
+
+- name: Upload certificate key.
+  ansible.builtin.copy:
+    src: "{{ ssl_key_file }}"
+    dest: /local/certs/privkey.pem

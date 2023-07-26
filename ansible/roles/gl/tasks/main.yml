@@ -1,0 +1,8 @@
+---
+- name: Upload SSL Certificates
+  ansible.builtin.include_tasks:
+    file: upload_ssl.yml
+
+- name: Install GreenLight
+  ansible.builtin.include_tasks:
+    file: install_gl.yml

@@ -1,0 +1,11 @@
+URL_HOST={{hostname}}
+SECRET_KEY_BASE={{secret_key_base}}
+LOADBALANCER_SECRET={{lb_secret}}
+DATABASE_URL=postgres://{{db_root_username}}:{{db_root_password}}@{{db_dns}}:5432/{{db_name}}
+REDIS_URL=redis://{{cache_dns}}:6379
+SCALELITE_TAG={{scalelite_tag | default("v1.5-stable-focal260-alpine", true)}}
+SCALELITE_RECORDING_DIR=/mnt/scalelite-recordings/var/bigbluebutton
+NGINX_SSL=true
+{% if enable_tenants %}
+MULTITENANCY_ENABLED=true
+{% endif %}

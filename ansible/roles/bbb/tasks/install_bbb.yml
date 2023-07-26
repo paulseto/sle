@@ -1,0 +1,23 @@
+---
+- name: Download installer
+  ansible.builtin.get_url:
+    url: https://ubuntu.bigbluebutton.org/bbb-install-2.6.sh
+    dest: /root/bbb-install-2.6.sh
+    mode: "0774"
+
+- name: Run bbb installer
+  ansible.builtin.shell:
+    cmd: |
+      /root/bbb-install-2.6.sh -v focal-260 -s {{ hostname }} -d -w
+      bbb-conf --setsecret {{secret}}
+      bbb-conf --restart
+  args:
+    executable: /bin/bash
+
+- name: Set secret
+  ansible.builtin.shell:
+    cmd: |
+      bbb-conf --setsecret {{secret}}
+      bbb-conf --restart
+  args:
+    executable: /bin/bash

@@ -1,0 +1,10 @@
+---
+- name: Install docker
+  ansible.builtin.apt:
+    pkg:
+      - docker.io
+      - docker-compose
+    state: latest
+
+
+

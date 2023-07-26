@@ -1,0 +1,33 @@
+---
+- name: Create folder for SSL
+  ansible.builtin.file:
+    name: "/etc/default/ssl/tenant"
+    state: directory
+
+- name: Upload SSL Certificate
+  ansible.builtin.copy:
+    src: "{{ ssl_crt_file }}"
+    dest: "/etc/default/ssl/fullchain.pem"
+
+- name: Upload SSL Key
+  ansible.builtin.copy:
+    src: "{{ ssl_key_file }}"
+    dest: "/etc/default/ssl/privkey.pem"
+
+- name: Create folder for Tenants SSL
+  ansible.builtin.file:
+    name: "/etc/default/tenant_ssl"
+    state: directory
+  when: enable_tenants
+
+- name: Upload Tenant SSL Certificate
+  ansible.builtin.copy:
+    src: "{{ tenant_crt_file }}"
+    dest: "/etc/default/tenant_ssl/fullchain.pem"
+  when: enable_tenants
+
+- name: Upload Tenant SSL Key
+  ansible.builtin.copy:
+    src: "{{ tenant_key_file }}"
+    dest: "/etc/default/tenant_ssl/privkey.pem"
+  when: enable_tenants

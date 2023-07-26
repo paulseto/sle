@@ -1,0 +1,9 @@
+---
+  - name: Add Tenant
+    ansible.builtin.shell:
+      cmd: |
+        docker exec -it scalelite-api bin/rails tenants:add[{{tenant_host | split('.') | first}},{{tenant_secret}},1]
+    register: result
+
+  - debug:
+      var: result

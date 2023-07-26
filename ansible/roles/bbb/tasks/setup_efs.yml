@@ -1,0 +1,44 @@
+---
+# See https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html#installing-other-distro
+- name: Install efs utilities
+  ansible.builtin.shell:
+    cmd: |
+      cd ~
+      sudo apt install -y git binutils
+      git clone https://github.com/aws/efs-utils
+      cd efs-utils
+      ./build-deb.sh
+      sudo apt install -y ./build/amazon-efs-utils*deb
+    executable: /bin/bash
+
+
+- name: Create folder for EFS
+  ansible.builtin.file:
+    path: /mnt/scalelite-recordings
+    state: directory
+
+- name: Mount EFS
+  ansible.builtin.mount:
+    path: /mnt/scalelite-recordings
+    state: mounted
+    opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+    fstype: nfs4
+    src: "{{ efs_dns }}:/"
+
+- name: Create scalelite-spool group; add bigbluebutton user
+  ansible.builtin.shell:
+    cmd: |
+      # Create a new group with GID 2000
+      groupadd -g 2000 scalelite-spool
+      # Add the bigbluebutton user to the group
+      usermod -a -G scalelite-spool bigbluebutton
+
+- name: Copy mount configuration
+  ansible.builtin.copy:
+   src: scalelite.yml
+   dest: /usr/local/bigbluebutton/core/scripts/scalelite.yml
+
+- name: Copy post publish script
+  ansible.builtin.copy:
+   src: scalelite_post_publish.rb
+   dest: /usr/local/bigbluebutton/core/scripts/post_publish/scalelite_post_publish.rb

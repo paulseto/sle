@@ -1,0 +1,31 @@
+---
+- name: Setup EFS folders
+  ansible.builtin.include_tasks:
+    file: setup_efs_folders.yml
+
+- name: Setup Docker
+  ansible.builtin.include_tasks:
+    file: install_docker.yml
+
+- name: Upload SSL
+  ansible.builtin.include_tasks:
+    file: upload_ssl.yml
+
+- name: Setup docker network
+  ansible.builtin.docker_network:
+    name: scalelite
+    state: present
+
+- name: Setup docker database
+  ansible.builtin.include_tasks:
+    file: setup_db_docker.yml
+  when: db_use_docker
+
+- name: Setup docker cache
+  ansible.builtin.include_tasks:
+    file: setup_cache_docker.yml
+  when: cache_use_docker
+
+- name: Setup Scalelite
+  ansible.builtin.include_tasks:
+    file: setup_scalelite.yml

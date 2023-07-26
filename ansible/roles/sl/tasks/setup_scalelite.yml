@@ -1,0 +1,91 @@
+
+---
+- name: Make log folders
+  ansible.builtin.file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /var/log/scalelite-nginx
+    - /var/log/scalelite-api
+    - /var/log/scalelite-poller
+    - /var/log/scalelite-recording-importer
+
+- name: Upload configuration file
+  ansible.builtin.template:
+    src: scalelite.j2
+    dest: /etc/default/scalelite
+
+- name: Copy service files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  with_items:
+    - scalelite.target
+    - scalelite-api.service
+
+# Fails
+# - name: Enable and start services
+#   ansible.builtin.systemd:
+#     name: "{{item}}"
+#     state: started
+#     enabled: true
+#   with_items:
+#     - scalelite.target
+#     - scalelite-api.service
+
+- name: Enable and start scalelite.target
+  ansible.builtin.shell:
+    cmd: |
+      systemctl enable scalelite.target
+      systemctl start scalelite.target
+
+- name: Enable and start scalelite-api
+  ansible.builtin.shell:
+    cmd: |
+      systemctl enable scalelite-api
+      systemctl start scalelite-api
+
+- name: Wait for scalelite-api to startup
+  ansible.builtin.wait_for:
+    timeout: 10
+
+- name: Setup database
+  ansible.builtin.shell:
+    cmd: |
+      docker exec -t scalelite-api bin/rake db:schema:load
+      docker exec -t scalelite-api bin/rake db:seed
+  when: primary
+
+- name: Copy service files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  with_items:
+    - scalelite-poller.service
+    - scalelite-recording-importer.service
+
+- name: Upload tenants nginx configuration
+  ansible.builtin.copy:
+    src: tenants.conf
+    dest: /etc/default/tenants.conf
+  when: enable_tenants
+
+- name: Copy nginx service files
+  ansible.builtin.template:
+    src: scalelite-nginx.service.j2
+    dest: "/etc/systemd/system/scalelite-nginx.service"
+
+- name: Enable and start services
+  ansible.builtin.systemd:
+    name: "{{item}}"
+    enabled: true
+    state: started
+  with_items:
+    - scalelite-poller.service
+    - scalelite-recording-importer.service
+    - scalelite-nginx.service
+
+- name: Restart scalelite services
+  ansible.builtin.systemd:
+    name: scalelite.target
+    state: restarted

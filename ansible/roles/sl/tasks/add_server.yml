@@ -1,0 +1,14 @@
+---
+  - name: Add BBB Servers to Scalelite Pool
+    ansible.builtin.shell:
+      cmd: |
+        docker exec -it scalelite-api bin/rails servers:add[https://{{bbb_server}}/bigbluebutton/api,{{bbb_secret}},1]
+    register: result
+
+  - debug:
+      var: result
+
+  - name: Enable BBB Server
+    ansible.builtin.shell:
+      cmd: |
+        docker exec -it scalelite-api bin/rails servers:enable[{{result.stdout_lines[1] | split(' ') | last}}]

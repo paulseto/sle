@@ -1,0 +1,6 @@
+# Local directory for temporary storage of working files
+work_dir: /var/bigbluebutton/recording/scalelite
+# Directory to place recording files for scalelite to import
+spool_dir: /mnt/scalelite-recordings/var/bigbluebutton/spool
+# Extra rsync options for keeping the permissions of the copied files as defined for the directories.
+# extra_rsync_opts: ["-av", "--no-owner", "--chmod=F664"]

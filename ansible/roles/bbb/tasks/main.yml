@@ -1,0 +1,13 @@
+---
+  - name: Install SSL certificate
+    ansible.builtin.include_tasks:
+      file: upload_ssl.yml
+
+  - name: Install BBB
+    ansible.builtin.include_tasks:
+      file: install_bbb.yml
+
+  - name: Setup EFS
+    ansible.builtin.include_tasks:
+      file: setup_efs.yml
+    when: ( efs_dns | default("") ) != ""

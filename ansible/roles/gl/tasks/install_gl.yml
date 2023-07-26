@@ -1,0 +1,24 @@
+---
+- name: Download GreenLight installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/bigbluebutton/greenlight/master/gl-install.sh
+    dest: /root/gl-install.sh
+    mode: "0774"
+
+- name: Run GreenLight installer
+  ansible.builtin.shell:
+    cmd: |
+      /root/gl-install.sh -s {{ hostname }} -b {{ sl_hostname }}:{{ sl_secret }} -d
+  args:
+    executable: /bin/bash
+
+- name: Wait for docker containers to start
+  ansible.builtin.wait_for:
+    timeout: 10
+
+- name: Create Admin User
+  ansible.builtin.shell:
+    cmd: |
+      docker exec -it greenlight-v3 bundle exec rake admin:create["{{admin_name}}","{{admin_email}}","{{admin_password}}"]
+  args:
+    executable: /bin/bash

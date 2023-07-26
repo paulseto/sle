@@ -1,0 +1,26 @@
+---
+- name: Create log folder
+  ansible.builtin.file:
+    path: /var/log/postgresql
+    state: directory
+
+- name: Create data folder
+  ansible.builtin.file:
+    path: /var/lib/postgresql/data
+    state: directory
+
+- name: Copy postgres environment file
+  ansible.builtin.template:
+    src: postgres.j2
+    dest: /etc/default/postgres
+
+- name: Copy postgres service
+  ansible.builtin.copy:
+    src: postgres.service
+    dest: /etc/systemd/system/postgres.service
+
+- name: Enable postgres
+  ansible.builtin.systemd_service:
+    name: postgres
+    enabled: true
+    state: started

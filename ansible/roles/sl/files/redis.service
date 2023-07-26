@@ -1,0 +1,21 @@
+[Unit]
+Description=Redis
+After=network-online.target
+Wants=network-online.target
+Before=scalelite.target
+PartOf=scalelite.target
+[Service]
+EnvironmentFile=/etc/default/redis
+ExecStartPre=-/usr/bin/docker kill cache
+ExecStartPre=-/usr/bin/docker rm cache
+ExecStartPre=/usr/bin/docker pull ${IMAGE}
+ExecStart=/usr/bin/docker run \
+	--log-opt max-size=10m \
+	--log-opt max-file=5 \
+	--name cache \
+	--env-file /etc/default/redis \
+	--network scalelite \
+	${IMAGE}
+ExecStartPost=/usr/bin/docker image prune -f
+[Install]
+WantedBy=scalelite.target

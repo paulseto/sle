@@ -1,0 +1,23 @@
+[Unit]
+Description=Postgres
+After=network-online.target
+Wants=network-online.target
+Before=scalelite.target
+PartOf=scalelite.target
+[Service]
+EnvironmentFile=/etc/default/postgres
+ExecStartPre=-/usr/bin/docker kill db
+ExecStartPre=-/usr/bin/docker rm db
+ExecStartPre=/usr/bin/docker pull ${IMAGE}
+ExecStart=/usr/bin/docker run \
+	--log-opt max-size=10m \
+	--log-opt max-file=5 \
+	--name db \
+	--env-file /etc/default/postgres \
+	--network scalelite \
+	--mount type=bind,source=/var/lib/postgresql/data,target=/var/lib/postgresql/data \
+	--mount type=bind,source=/var/log/postgresql,target=/var/log/postgresql \
+	${IMAGE}
+ExecStartPost=/usr/bin/docker image prune -f
+[Install]
+WantedBy=scalelite.target

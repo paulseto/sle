@@ -1,0 +1,16 @@
+---
+- name: Copy redis environment file
+  ansible.builtin.template:
+    src: redis.j2
+    dest: /etc/default/redis
+
+- name: Copy redis service
+  ansible.builtin.copy:
+    src: redis.service
+    dest: /etc/systemd/system/redis.service
+
+- name: Enable redis
+  ansible.builtin.systemd_service:
+    name: redis
+    enabled: true
+    state: started
