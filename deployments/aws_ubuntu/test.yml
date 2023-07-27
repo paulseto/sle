@@ -1,0 +1,14 @@
+id: 1f98e331-0522-4d35-8a19-b69599871cc9
+	url: https://b1.mountcorona.com/bigbluebutton/api
+	secret: 1196652d9169bb2cc1f2052bcd388a41cfd572b57b0eb2c75bc4d57ee3b71f66
+	enabled
+	load: 0.0
+	load multiplier: 1.0
+	online
+id: f2fbafff-e20e-4a38-948a-7f1bc75cef69
+	url: https://b2.mountcorona.com/bigbluebutton/api
+	secret: b9a2807f6d2762905cfc2ebe02966aec7ba60de1027948a6872baf58b75b2b89
+	enabled
+	load: 0.0
+	load multiplier: 1.0
+	online

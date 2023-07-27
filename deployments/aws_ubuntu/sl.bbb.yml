@@ -1,0 +1,29 @@
+---
+- name: Register BBB servers through the primary Scalelite server
+  hosts: "*"
+  become: yes
+
+  tasks:
+  - name: Add BBB servers to Scalelite Pool
+    ansible.builtin.include_role:
+      name: sl
+      tasks_from: add_server.yml
+    vars:
+      bbb_server: "{{item.key}}"
+      bbb_secret: "{{item.value}}"
+    loop: "{{ lookup('dict', bbb_secrets) }}"
+    when: primary
+
+  # - name: Add BBB Servers to Scalelite Pool
+  #   ansible.builtin.shell:
+  #     cmd: |
+  #       docker exec -it scalelite-api bin/rails servers:add[https://{{item.key}}/bigbluebutton/api,{{item.value}},1]
+  #   loop: "{{ lookup('dict', bbb_secrets) }}"
+  #   when: primary
+
+  # - name: Add Tenants
+  #   ansible.builtin.shell:
+  #     cmd: |
+  #       docker exec -it scalelite-api bin/rails tenants:add[{{item.key | split('.') | first}},{{item.value}}]
+  #   loop: "{{ lookup('dict', tenants) }}"
+  #   when: primary and enable_tenants

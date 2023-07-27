@@ -1,0 +1,91 @@
+prefix: bbb
+domain: mydomain.com
+email: email@domain.com
+hostname_pattern: "%s%d"
+ami_name_filter: ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*
+iam_role: BBBRole
+
+aws:
+  region: ca-central-1
+  profile: default
+
+eip:
+  create: true
+  hostnames:
+    - b1
+    - b2
+    - sl
+    - gl
+
+efs:
+  create: true
+
+vpc:
+  cidr: 172.60.0.0/16
+  bits: 8
+  az:
+    - a
+    - b
+
+# https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.SupportAurora
+db:
+  use_docker: true
+  docker_image: postgres:alpine3.18
+  engine: aurora-postgresql
+  engine_version: 15.3
+  parameter_group: aurora-postgresql15
+  instance_type: db.t3.medium
+  instance_count: 2
+  root_username: postgres
+
+cache:
+  use_docker: true
+  docker_image: redis:6.0.20-alpine3.18
+  instance_type: cache.t4g.micro
+  instance_count: 2
+  engine: redis7
+  engine_version: 7.x
+  parameter_group: default.redis7
+
+bbb:
+  type: c5.4xlarge
+  count: 2
+  hostname: b
+  iam_role: BBBServer
+  secrets:
+    b1: 1196652d9169bb2cc1f2052bcd388a41cfd572b57b0eb2c75bc4d57ee3b71f66
+    b2: b9a2807f6d2762905cfc2ebe02966aec7ba60de1027948a6872baf58b75b2b89
+
+sl:
+  hostname: sl
+  type: c5.xlarge
+  count: 1
+  iam_role: SLServer
+  load_balancer_secret: 7b1dd79654e509494dc7718bc34ff1b0313e2ba6a9b180c53a4ee28ebaffa795
+  scalelite_tag: v1.5-stable-focal260-alpine
+  enable_tenants: false
+  tenants:
+    t1: 85af3158ee8f2fbee5dd7093d686e9485b423678f8c06c2ab6a63adc2016b5a2
+    t2: 9b2a44299ed9fd7078f55fb7a23e06771efd896dbef25a23f8fb4dda685df110
+  tenant_ssl:
+    crt_file: ~/ssl/_.sl.domain.com.crt
+    key_file: ~/ssl/_.sl.domain.com.key
+
+gl:
+  hostname: gl
+  type: c5.xlarge
+  instance_count: 1
+  iam_role: GLServer
+  admin:
+    name: "First Last"
+    email: first.last@domain.com
+    password: FA30be740_35EEcaa!6c
+
+ssl:
+  crt_file: ~/.ssl/certificates/_.domain.com.crt
+  key_file: ~/.ssl/certificates/_.domain.com.key
+
+ssh:
+  user: ubuntu
+  key_name: development
+  key_file: ~/.ssh/development.pem

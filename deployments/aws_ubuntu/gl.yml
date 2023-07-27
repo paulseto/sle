@@ -1,0 +1,16 @@
+---
+- name: Update GreenLight servers
+  hosts: "*"
+  become: yes
+
+  tasks:
+  - name: Package Updates
+    ansible.builtin.apt:
+      name: "*"
+      state: latest
+
+  - name: Configure GreenLight
+    ansible.builtin.include_role:
+      name: gl
+
+

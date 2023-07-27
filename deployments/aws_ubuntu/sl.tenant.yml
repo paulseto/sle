@@ -1,0 +1,15 @@
+---
+- name: Register Tenants through the primary Scalelite server
+  hosts: "*"
+  become: yes
+
+  tasks:
+  - name: Add Tenants
+    ansible.builtin.include_role:
+      name: sl
+      tasks_from: add_tenant.yml
+    vars:
+      tenant_host: "{{item.key}}"
+      tenant_secret: "{{item.value}}"
+    loop: "{{ lookup('dict', tenants) }}"
+    when: primary and enable_tenants
